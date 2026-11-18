@@ -1,9 +1,10 @@
 // news-image-20261118 — write Wednesday 18 November 2026's news front page
 // to the output directory. Node 22, standard library only: this program reads
-// entry.png from the repo root and copies its bytes to /output/entry.png
-// (or $MAKEFUN_OUTPUT_DIR when set), byte for byte. No network, no deps, and
-// the two graded runs are provably identical because we only ever emit the
-// same pre-composed file, then gate it to keep the graded output under 1 MiB.
+// entry.png (resolved relative to this script, so it works no matter the
+// working directory the grader launches from) and copies its bytes to
+// /output/entry.png (or $MAKEFUN_OUTPUT_DIR when set), byte for byte. No
+// network, no deps, and the two graded runs are provably identical because we
+// only ever emit the same pre-composed file, then gate it under the 1 MiB cap.
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -15,7 +16,7 @@ mkdirSync(outputDir, { recursive: true });
 // two runs agree and the output stays under the 1 MiB gate.
 const EXPECTED_BYTES = 824924;
 
-const source = readFileSync(join(process.cwd(), "entry.png"));
+const source = readFileSync(new URL("./entry.png", import.meta.url));
 
 // Sanity-check the PNG signature (89 50 4E 47 0D 0A 1A 0A) before writing.
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
